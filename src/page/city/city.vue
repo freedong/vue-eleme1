@@ -2,7 +2,7 @@
     <div class="city_container" id="city">
       <!-- 头部栏 -->
       <head-top :head-title="cityname" go-back='true'>
-        <router-link :to="/home/" class="change_city" slot="changecity">切换城市</router-link>
+        <router-link to="/home/" class="change_city" slot="changecity">切换城市</router-link>
       </head-top>
 
       <!-- 信息提交 -->
@@ -14,16 +14,111 @@
           <input type="submit" name="submit" class="city_submit input_style" @click='postpois' value="提交">
         </div>
       </form>
+
+      <!-- 搜索历史 -->
+      <header v-if="historytitle" class="pois_search_history">搜索历史</header>
+      <ul class="getpois_ul">
+        <li v-for="(item,index) in placelist" @click="nextpage(index,item.geohash)" :key="index">
+          <h4 class="pois_name ellipsis">{{ item.name }}</h4>
+          <p class="pois_address ellipsis">{{ item.address }}</p>
+        </li>
+      </ul>
+
+      <!-- 清空所有 -->
+      <footer v-if="historytitle&&placelist.length" class="clear_all_history" @click="clearAll">清空所有</footer>
+      <div class="search_none_place" v-if="placeNone">很抱歉！无搜索结果</div>
     </div>
 </template>
 
 <script>
 import headTop from 'src/components/header/head'
+
+// 请求后台数据
+import {currentcity,searchplace} from 'src/service/getData'
+// 引用自己封装的函数工具
+import {getStore,setStore,removeStore} from 'src/config/mUtils'
 export default {
   name:'city',
   components:{
     headTop
   },
+  data(){
+    return {
+      inputVaule:'', // 搜索地址
+      cityid:'', // 当前城市id
+      cityname:'', // 当前城市名字
+      placelist:[], // 搜索地址列表
+      placeHistory:[], // 历史搜索记录
+      historytitle: true, // 默认显示搜索历史头部，点击搜索后隐藏
+      placeNone: false, // 搜索无结果，显示提示信息
+    }
+  },
+  mounted(){
+    this.cityid = this.$route.params.cityid;
+    console.log(this.cityid);
+    currentcity(this.cityid).then(res => {
+        console.log(res);
+        this.cityname = res.name;
+    })
+    this.initData();
+  },
+
+  methods:{
+    // 搜索历史记录列表初始化
+    initData(){
+      // 获取搜索历史记录
+      if(getStore('placeHistory')){
+        this.placelist = JSON.parse(getStore('placeHistory'));
+      }else{
+        this.placelist = [];
+      }
+    },
+    // 提交搜索信息给服务器
+    postpois(){
+      // 输入值不为空时才发送信息
+      if(this.inputVaule){
+        searchplace(this.cityid,this.inputVaule).then(res => {
+          console.log(res);
+          // 搜索的时候  标题不出现
+          this.historytitle = false;
+          // 有结果时不出现提示信息：搜索无结果，显示提示信息
+          this.placeNone = res.length? false : true;
+          // 搜索历史信息列表
+          this.placelist = res;
+          console.log(res);
+        })
+      }
+    },
+    //点击搜索结果进入下一页面时进行判断是否已经有一样的历史记录
+    //如果没有则新增，如果有则不做重复储存，判断完成后进入下一页
+    nextpage(index,geohash){
+      let history = getStore('placeHistory');
+      console.log(history);
+      let choosePlace = this.placelist[index];
+      // 如果history有则遍历一下，geohash相等则不添加到placeHistory  不等则添加到placeHistory
+      if(history){
+        let checkrepeat = false;
+        this.placeHistory = JSON.parse(history);
+        this.placeHistory.forEach(item => {
+          if(item.geohash == geohash) {
+            checkrepeat = true;
+          }
+        })
+        if(!checkrepeat){
+          this.placeHistory.push(choosePlace);
+        }
+      }else{ //如果history没有则添加choosePlace到placeHistory
+        this.placeHistory.push(choosePlace);
+      }
+      setStore('placeHistory',this.placeHistory);
+      this.$router.push({path:'/msite',query:{geohash}})
+    },
+
+    clearAll(){
+      removeStore('placeHistory');
+      this.initData();
+    },
+  }
 }
 </script>
 

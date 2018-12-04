@@ -49,6 +49,12 @@ export default new Router({
           path:'/city/:cityid',
           component:city
         },
+        // 所有商铺列表页
+        {
+          path:'/msite',
+          component:msite,
+          // meta:{}
+        },
       ]
     }
   ],
