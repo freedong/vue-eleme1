@@ -19,6 +19,8 @@ import App from '../App.vue'
 const home = r => require.ensure([],() => r(require('../page/home/home')),'home')
 //城市信息页面
 const city = r => require.ensure([],() => r(require('../page/city/city')),'city')
+//所有商铺列表页
+const msite = r => require.ensure([],() => r(require('../page/msite/msite')),'msite')
 
 
 
@@ -53,7 +55,7 @@ export default new Router({
         {
           path:'/msite',
           component:msite,
-          // meta:{}
+          meta:{ keepAlive:true },
         },
       ]
     }

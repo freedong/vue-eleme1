@@ -3,8 +3,11 @@
   <div id="app1">
     <!-- 根据路由跳转到app的二级路由页面 -->
     <transition name="router-fade" mode="out-in">
-      <!-- 如果路由中有meta属性且keepAlive为true  走这个路由 -->
-      <router-view v-if="$route.meta.keepAlive"></router-view>
+      <!-- keep-alive是Vue的内置组件,能在组件切换过程中将状态保留在内存中,防止重复渲染DOM。 -->
+      <keep-alive>
+        <!-- 如果路由中有meta属性且keepAlive为true  走这个路由 -->
+        <router-view v-if="$route.meta.keepAlive"></router-view>
+      </keep-alive>
     </transition>
     <transition name="router-fade" mode="out-in">
       <!-- 如果路由中有meta属性且keepAlive为false  走这个路由 -->
