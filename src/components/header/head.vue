@@ -1,5 +1,7 @@
 <template lang="html">
   <header id="head_top">
+    <!-- 搜索插槽 -->
+    <slot name="search"></slot>
     <!--公共部分 -->
     <!-- 返回箭头 根据goBack判断是否出现 -->
     <section class="head_goback" v-if="goBack" @click="$router.go(-1)">
@@ -24,6 +26,9 @@
 
     <!-- 当前城市页面插槽 -->
     <slot name='changecity'></slot>
+
+    <!-- msite页面插槽 -->
+    <slot name="msite-title"></slot>
 
   </header>
 </template>
