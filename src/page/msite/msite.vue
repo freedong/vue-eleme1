@@ -52,14 +52,31 @@ import headTop from 'src/components/header/head'
 import shopList from 'src/components/common/shoplist'
 export default {
   name:'msite',
+  // 数据
   data(){
     return {
-      geohash: '', // city页面传递过来的地址geohash
-      msiteTitle: '请选择地址...', // msite页面头部标题
+      geohash: '',                        // city页面传递过来的地址geohash
+      msiteTitle: '请选择地址...',         // msite页面头部标题
+      foodTypes: [],                      //食品分类列表
     }
   },
+  // 组件
   components:{
     headTop,
+  },
+  // 在挂载之前
+  async beforeMount(){
+    // 获取url中的geohash
+    if(!this.$route.query.geohash){
+      // const address =
+    }else{
+      this.geohash = this.$route.query.geohash;
+    }
+  },
+  // 挂载
+  mounted(){
+
+
   },
 }
 </script>
